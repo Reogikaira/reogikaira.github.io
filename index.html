@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="pt-BR">
+  <link rel="stylesheet" href="css/style.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Inventário</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Página de Inventário -->
+    <div id="inventory-page" class="page">
+      <header>
+        <div class="header-title">
+          <h1 id="character-name">Caçador</h1>
+          <span class="edit-icon" onclick="editCharacterName()">✏️</span>
+        </div>
+        <div class="search-container">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Pesquisar itens..."
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+      </header>
+      <div class="inventory-grid" id="inventory-grid"></div>
+      <button id="add-button">+</button>
+    </div>
+
+    <!-- Página de Detalhes do Item -->
+    <div id="detail-page" class="page">
+      <header>
+        <button class="back-button" id="back-to-inventory">&larr;</button>
+        <h2 id="detail-name"></h2>
+      </header>
+      <div id="detail-image"></div>
+      <div id="ammo-icons"></div>
+      <p id="detail-description"></p>
+      <p id="detail-quantity"></p>
+      <p id="detail-ammo"></p>
+      <div class="actions" id="detail-actions"></div>
+      <button id="delete-button">Remover Item</button>
+    </div>
+
+    <!-- Página de Adicionar Item -->
+    <div id="add-page" class="page">
+      <header>
+        <button class="back-button" id="back-to-inventory-add">&larr;</button>
+        <h2>Adicionar novo item</h2>
+      </header>
+      <form id="add-form">
+        <div
+          id="add-icon-upload"
+          onclick="document.getElementById('add-icon').click()"
+        >
+          <img src="img/plus1.png" alt="Ícone" />
+          <p>Toque para selecionar o ícone da galeria</p>
+        </div>
+        <input
+          type="file"
+          id="add-icon"
+          accept="image/*"
+          style="display: none"
+        />
+        <div class="form-group">
+          <label for="add-name">Nome do item</label>
+          <input
+            type="text"
+            id="add-name"
+            placeholder="Por exemplo, faca de prata, lanterna."
+          />
+        </div>
+        <div class="form-group">
+          <label>Tipo de item</label>
+          <div class="type-buttons">
+            <button type="button" class="type-button" data-type="weapon">
+              <span class="type-icon">
+                <img src="img/arma1.png" alt="Arma"
+              /></span>
+              Armas de fogo
+            </button>
+            <button type="button" class="type-button" data-type="equipment">
+              <span class="type-icon"
+                ><img src="img/espada1.png" alt="Arma2"
+              /></span>
+              Armas corpo a corpo
+            </button>
+            <button type="button" class="type-button" data-type="consumable">
+              <span class="type-icon"
+                ><img src="img/caixa1.png" alt="caixa1" class="type-icon" id="caixa1-icon"
+              /></span>
+              Itens
+            </button>
+          </div>
+          <input type="hidden" id="add-type" />
+        </div>
+        <div class="form-group">
+          <label for="add-quantity">Quantidade</label>
+          <input type="number" id="add-quantity" value="1" min="1" />
+        </div>
+        <div class="ammo-fields">
+          <div class="form-group">
+            <label for="add-max-ammo">Munição máxima</label>
+            <input
+              type="number"
+              id="add-max-ammo"
+              placeholder="Exemplo: 6, 30"
+              min="0"
+            />
+          </div>
+          <div class="form-group">
+            <label for="add-current-ammo">Munição atual</label>
+            <input type="number" id="add-current-ammo" value="0" min="0" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="add-description">Descrição</label>
+          <textarea
+            id="add-description"
+            placeholder="Descrição do item"
+          ></textarea>
+        </div>
+        <button type="submit">Adicionar</button>
+      </form>
+    </div>
+
+    <script>
+      // JavaScript Otimizado - Funções funcionais, correções de HUD e visibilidade de botões
+      let items = JSON.parse(localStorage.getItem("motwInventory")) || [];
+      let currentItemId = null;
+      const placeholderIcon =
+        "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8dGV4dCB4PSIwIiB5PSIyNSIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2FhYSI+Tm8gQ29udGVudDwvdGV4dD4KPC9zdmc+";
+      const bulletIcon =
+        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCAyMCA1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAgMCBMNSAxMCBIMTUgTDEwIDAgTTUgMTAgSDE1IFY1MCBINSBWMTAgWiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="; // Ícone minimalista de bala
+
+      let characterName =
+        localStorage.getItem("motwCharacterName") || "Caçador";
+      document.getElementById("character-name").textContent = characterName;
+       
+      function editCharacterName() {
+        const newName = prompt(
+          "Digite o nome do seu personagem:",
+          characterName,
+        );
+        if (newName && newName.trim() !== "") {
+          characterName = newName.trim();
+          localStorage.setItem("motwCharacterName", characterName);
+          document.getElementById("character-name").textContent = characterName;
+        }
+      }
+
+      function isWeapon(type) {
+        return type === "weapon";
+      }
+
+      function isNormalItem(type) {
+        return type === "equipment" || type === "consumable";
+      }
+
+      function renderInventory(filter = "") {
+        const grid = document.getElementById("inventory-grid");
+        grid.innerHTML = "";
+        const filteredItems = items.filter((item) =>
+          item.name.toLowerCase().includes(filter.toLowerCase()),
+        );
+        filteredItems.forEach((item) => {
+          const card = document.createElement("div");
+          card.classList.add("item-card");
+          card.dataset.id = item.id;
+
+          const imageDiv = document.createElement("div");
+          imageDiv.classList.add("item-image");
+          const img = document.createElement("img");
+          img.src = item.icon || placeholderIcon;
+          imageDiv.appendChild(img);
+
+          const badge = document.createElement("span");
+          badge.classList.add("badge");
+          if (isWeapon(item.type)) {
+            badge.textContent = `${item.currentAmmo}/${item.maxAmmo}`;
+          } else {
+            badge.textContent = item.quantity;
+          }
+          imageDiv.appendChild(badge);
+
+          const name = document.createElement("p");
+          name.classList.add("item-name");
+          name.textContent = item.name || "Sem Nome";
+
+          card.appendChild(imageDiv);
+          card.appendChild(name);
+          card.addEventListener("click", () => showDetail(item.id));
+          grid.appendChild(card);
+        });
+      }
+
+      function showPage(pageId) {
+        document.querySelectorAll(".page").forEach((page) => {
+          page.style.display = "none";
+          page.classList.remove("active");
+        });
+        const targetPage = document.getElementById(pageId);
+        targetPage.style.display = "block";
+        setTimeout(() => targetPage.classList.add("active"), 10); // Para animação suave
+      }
+
+      function showDetail(id) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
+    currentItemId = id;
+    document.getElementById("detail-name").textContent = item.name || "Item Sem Nome";
+    document.getElementById("detail-description").textContent = item.description;
+    document.getElementById("detail-quantity").textContent = isNormalItem(item.type) ? `Quantidade: ${item.quantity}` : "";
+    document.getElementById("detail-ammo").textContent = isWeapon(item.type) ? `Munição: ${item.currentAmmo} / ${item.maxAmmo}` : "";
+
+    const imageDiv = document.getElementById("detail-image");
+    imageDiv.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = item.icon || placeholderIcon;
+    imageDiv.appendChild(img);
+
+    const ammoIcons = document.getElementById("ammo-icons");
+    ammoIcons.innerHTML = "";
+    if (isWeapon(item.type)) {
+        for (let i = 0; i < item.currentAmmo; i++) {
+            const ammoImg = document.createElement("img");
+            ammoImg.src = bulletIcon;
+            ammoImg.classList.add("ammo-icon");
+            ammoIcons.appendChild(ammoImg);
+        }
+    }
+
+    const actions = document.getElementById("detail-actions");
+    actions.innerHTML = "";
+
+    if (isWeapon(item.type)) {
+        const fireBtn = document.createElement("button");
+        fireBtn.textContent = "Atirar";
+        fireBtn.onclick = () => fireWeapon(id);
+        actions.appendChild(fireBtn);
+
+        const reloadBtn = document.createElement("button");
+        reloadBtn.textContent = "Recarregar";
+        reloadBtn.onclick = () => reloadWeapon(id);
+        actions.appendChild(reloadBtn);
+    } 
+    else if (item.type === "consumable") {
+        // EMPILHAR
+        const stackBtn = document.createElement("button");
+        stackBtn.textContent = "Empilhar";
+        stackBtn.onclick = () => addStack(id);
+        actions.appendChild(stackBtn);
+
+        // DIMINoiR
+        const subtractBtn = document.createElement("button");
+        subtractBtn.textContent = "Diminuir";
+        subtractBtn.onclick = () => subtractQuantity(id);
+        actions.appendChild(subtractBtn);
+    }
+
+    showPage("detail-page");
+}
+
+      function fireWeapon(id) {
+        const item = items.find((i) => i.id === id);
+        if (item && item.currentAmmo > 0) {
+          item.currentAmmo--;
+          saveItems();
+          showDetail(id);
+          renderInventory();
+        }
+      }
+
+      function reloadWeapon(id) {
+        const item = items.find((i) => i.id === id);
+        if (item) {
+          item.currentAmmo = item.maxAmmo;
+          saveItems();
+          showDetail(id);
+          renderInventory();
+        }
+      }
+
+      function addStack(id) {
+    const item = items.find(i => i.id === id);
+    if (item) {
+        const addQty = parseInt(prompt("Quantidade a adicionar:", "1")) || 0;
+        if (addQty > 0) {
+            item.quantity += addQty;
+            saveItems();
+            showDetail(id);
+            renderInventory();
+        }
+    }
+}
+    
+        
+       function subtractQuantity(id) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
+    const current = item.quantity || 0;
+    const qtyToRemove = parseInt(prompt(`Quantidade atual: ${current}\n\nQuantidade a REMOVER:`, "1")) || 0;
+
+    if (qtyToRemove <= 0) return;
+
+    item.quantity -= qtyToRemove;
+
+    if (item.quantity <= 0) {
+        items = items.filter(i => i.id !== id);
+        saveItems();           // ← ESSA LINHA ESTAVA FALTANDO
+        showPage("inventory-page");
+        renderInventory();     // ← Atualiza a tela principal
+    } else {
+        saveItems();
+        renderInventory();
+        if (currentItemId === id) showDetail(id);
+    }
+}
+
+      function removeItem(id) {
+        items = items.filter((i) => i.id !== id);
+        saveItems();
+        showPage("inventory-page");
+        renderInventory();
+      }
+
+      function saveItems() {
+        localStorage.setItem("motwInventory", JSON.stringify(items));
+      }
+
+      // Adicionar Item
+      document.getElementById("add-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        let name = document.getElementById("add-name").value || "Item Sem Nome";
+        let type = document.getElementById("add-type").value || "equipment";
+        const file = document.getElementById("add-icon").files[0];
+        let quantity =
+          parseInt(document.getElementById("add-quantity").value) || 1;
+        let maxAmmo =
+          parseInt(document.getElementById("add-max-ammo").value) || 0;
+        let currentAmmo =
+          parseInt(document.getElementById("add-current-ammo").value) ||
+          maxAmmo;
+        const description = document.getElementById("add-description").value;
+
+        const addItem = (iconSrc) => {
+          const newItem = {
+            id: Date.now(),
+            name,
+            type,
+            icon: iconSrc,
+            quantity,
+            maxAmmo,
+            currentAmmo,
+            description,
+          };
+          items.push(newItem);
+          saveItems();
+          renderInventory();
+          showPage("inventory-page");
+          resetAddForm();
+        };
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            addItem(e.target.result);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          addItem(placeholderIcon);
+        }
+      });
+
+      // Seleção de Tipo
+      const typeButtons = document.querySelectorAll(".type-button");
+      typeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          typeButtons.forEach((btn) => btn.classList.remove("selected"));
+          button.classList.add("selected");
+          document.getElementById("add-type").value = button.dataset.type;
+          document.querySelector(".ammo-fields").style.display = isWeapon(
+            button.dataset.type,
+          )
+            ? "block"
+            : "none";
+        });
+      });
+
+      // Prévia do Ícone
+      document.getElementById("add-icon").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            document.getElementById("add-icon-upload").innerHTML =
+              `<img src="${e.target.result}" alt="Ícone" style="max-width: 100%; max-height: 100px;">`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      function resetAddForm() {
+        document.getElementById("add-form").reset();
+        document.getElementById("add-icon-upload").innerHTML =
+          '<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMTUuNSA0MUgxNC41djMuNWMwIC43LS43IDEuMy0xLjUgMS4zcy0xLjUtLjYtMS41LTEuM1Y0MUg2LjVjLS43IDAtMS4zLS43LTEuMy0xLjVzLjYtMS41IDEuMy0xLjVoMy41VjM1LjVjMC0uNy43LTEuMyAxLjUtMS4zcy0xLjUuNi0xLjUuNXYzLjVoMVYzNS41YzAtLjc2Ljc2LTEuMzUgMS41LTEuMzVzMS41LjU5IDEuNSAxLjM1VjM5aDEuNXYtMy41YzAtLjc2Ljc2LTEuMzUgMS41LTEuMzVzMS41LjU5IDEuNSAxLjM1VjQxaDEuNXptNi0zLjVoLTEuNXYtMy41YzAtLjc2Ljc2LTEuMzUgMS41LTEuMzVzMS41LjU5IDEuNSAxLjM1VjM5aDEuNXYtMy41YzAtLjc2Ljc2LTEuMzUgMS41LTEuMzVzMS41LjU5IDEuNSAxLjM1VjQxaDEuNXptNi0zLjVoLTEuNXYtMy41YzAtLjc2Ljc2LTEuMzUgMS41LTEuMzVzMS41LjU5IDEuNSAxLjM1VjM5aDEuNXYtMy41YzAtLjc2Ljc2LTEuMzUgMS41LTEuMzVzMS41LjU5IDEuNSAxLjM1VjQxaDEuNXoiIGZpbGw9IiNhMGEwYTAiLz4KPC9zdmc+" alt="Ícone"><p>Toque para selecionar o ícone da galeria</p>';
+        document.querySelector(".ammo-fields").style.display = "none";
+        typeButtons.forEach((btn) => btn.classList.remove("selected"));
+      }
+
+      // Funcionalidade de Busca
+      const searchIcon = document.querySelector(".search-icon");
+      const searchInput = document.getElementById("search-input");
+      searchIcon.addEventListener("click", () => {
+        searchInput.classList.toggle("active");
+        if (searchInput.classList.contains("active")) {
+          searchInput.focus();
+        }
+      });
+
+      searchInput.addEventListener("input", (e) => {
+        renderInventory(e.target.value);
+      });
+
+      // Remover Item
+      document.getElementById("delete-button").addEventListener("click", () => {
+        if (
+          currentItemId &&
+          confirm("Tem certeza que deseja remover este item?")
+        ) {
+          removeItem(currentItemId);
+        }
+      });
+
+      // Navegação
+      document
+        .getElementById("add-button")
+        .addEventListener("click", () => showPage("add-page"));
+      document
+        .getElementById("back-to-inventory")
+        .addEventListener("click", () => showPage("inventory-page"));
+      document
+        .getElementById("back-to-inventory-add")
+        .addEventListener("click", () => showPage("inventory-page"));
+
+      // Inicializar
+      renderInventory();
+      showPage("inventory-page");
+    </script>
+  </body>
+</html>
