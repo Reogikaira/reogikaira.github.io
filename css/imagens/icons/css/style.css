@@ -1,0 +1,482 @@
+         * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'IM Fell English SC', serif;
+            background-color: #121212;
+            background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzAwMDAwMCIvPjxnIG9wYWNpdHk9IjAuMDUiPjxwYXRoIGQ9Ik0wIDBIMjAwVjIwMEgwVjBaIiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTAgMEgyMDBWMjAwSDBWMFpiIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjA1Ii8+PC9nPjwvc3ZnPg=='); /* Textura rústica escura */
+            color: #d1c4a8; /* Tom envelhecido */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        header {
+            padding: 15px;
+            background-color: #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid #4a2b1f; /* Borda rústica */
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #c7a57a; /* Tom dourado envelhecido */
+            margin-bottom: 5px;
+            margin-right: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            font-size: 18px;
+            color: #a0a0a0;
+            transition: color 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            color: #ff4d4d;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            font-size: 20px;
+            color: #d1c4a8;
+            cursor: pointer;
+        }
+
+        #search-input {
+            background-color: #2a2a2a;
+            color: #d1c4a8;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            width: 0;
+            opacity: 0;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            margin-right: 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #search-input.active {
+            width: 150px;
+            opacity: 1;
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 15px; /* Aumentado o padding superior para separar do cabeçalho */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .page.active {
+            opacity: 1;
+        }
+
+        #inventory-page {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Aumentado o tamanho mínimo das células */
+            gap: 20px; /* Aumentado o gap para mais separação e simetria */
+            justify-items: center; /* Centraliza os itens horizontalmente */
+            padding-top: 20px; /* Espaçamento adicional do topo para simetria */
+        }
+
+        .item-card {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 15px; /* Aumentado o padding interno para melhor simetria */
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            border: 1px solid #4a2b1f; /* Borda rústica */
+            width: 100%; /* Garante uniformidade */
+            max-width: 150px; /* Limita o tamanho máximo para simetria */
+        }
+
+        .item-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(138, 43, 226, 0.3);
+        }
+
+        .item-image {
+            position: relative;
+            width: 100%;
+            height: 85%; /* Aumentado para dar mais espaço ao ícone */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .item-image img {
+            width: 100%; /* Aumentado para tamanho maior e uniforme */
+            height: 100%; /* Aumentado para tamanho maior e uniforme */
+            object-fit: contain; /* Mantém a proporção sem achatar */
+            transition: filter 0.3s ease;
+            filter: sepia(0.3); /* Filtro rústico */
+        }
+
+        .item-card:hover .item-image img {
+            filter: brightness(1.1) sepia(0.3);
+        }
+
+        .badge {
+            position: absolute;
+            bottom: -10px;
+            right: 10px;
+            background-color: #4a2b1f;
+            color: #d1c4a8;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .item-name {
+            font-size: 12px;
+            margin-top: 10px;
+            word-wrap: break-word;
+            color: #c7a57a;
+        }
+
+        /* Página de Detalhes */
+        #detail-page {
+            text-align: center;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: #d1c4a8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            transition: color 0.3s ease;
+            z-index: 11;
+        }
+
+        .back-button:hover {
+            color: #ff4d4d;
+        }
+
+        #detail-name {
+            font-size: 20px;
+            margin: 0;
+            flex: 1;
+            text-align: center;
+            color: #c7a57a;
+        }
+
+        #detail-image {
+            width: 250px; /* Aumentado para tamanho maior */
+            height: 250px; /* Aumentado para tamanho maior */
+            margin: 0 auto 15px;
+        }
+
+        #detail-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: sepia(0.3);
+        }
+
+        #ammo-icons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .ammo-icon {
+            width: 15px;
+            height: 30px;
+        }
+
+        #detail-description, #detail-quantity, #detail-ammo {
+            font-size: 14px;
+            margin: 10px 0;
+            color: #d1c4a8;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centraliza os botões para simetria */
+        }
+
+        .actions button {
+            background-color: #4a2b1f;
+            color: #d1c4a8;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0; /* Aumentado o margin para separação */
+            cursor: pointer;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 300px; /* Limita largura para simetria */
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .actions button:hover {
+            background-color: #6a3b2f;
+        }
+
+        #delete-button {
+            background-color: #cc0000;
+        }
+
+        #delete-button:hover {
+            background-color: #990000;
+        }
+
+        /* Página de Adicionar Item */
+        #add-page header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #1a1a1a;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid #4a2b1f;
+        }
+
+        #add-page .back-button {
+            font-size: 24px;
+        }
+
+        #add-page h2 {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            color: #c7a57a;
+            margin: 0;
+        }
+
+        #add-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Aumentado o gap para mais separação e simetria */
+            align-items: center; /* Centraliza os elementos do form */
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 400px; /* Limita largura para simetria em telas maiores */
+        }
+
+        label {
+            font-size: 14px;
+            color: #d1c4a8;
+            margin-bottom: 5px;
+            text-align: center; /* Centraliza labels para simetria */
+        }
+
+        input, select, textarea {
+            background-color: #2a2a2a;
+            color: #d1c4a8;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+            transition: box-shadow 0.3s ease;
+            width: 100%;
+        }
+
+        input:focus, textarea:focus {
+            box-shadow: inset 0 2px 4px rgba(138, 43, 226, 0.3);
+        }
+
+        #add-icon-upload {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #add-icon-upload:hover {
+            background-color: #3a3a3a;
+        }
+
+        #add-icon-upload img {
+            width: 50px;
+            height: 50px;
+        }
+
+        #add-icon-upload p {
+            color: #a0a0a0;
+            font-size: 12px;
+        }
+
+        .type-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center; /* Centraliza os botões de tipo */
+            width: 100%;
+        }
+
+        .type-button {
+            flex: 1;
+            background-color: #2a2a2a;
+            color: #d1c4a8;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            max-width: 120px; /* Limita para simetria */
+        }
+
+        .type-button.selected {
+            background-color: #6a3b2f;
+        }
+
+        .type-button:hover {
+            background-color: #3a3a3a;
+        }
+
+        .type-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+         
+         .type-icon img{
+    width:50px;
+    height:50px;
+    vertical-align:middle;
+         }
+             #boxu-icon{
+    width:30px;
+    height:30px;
+    
+}
+         
+        #add-form button[type="submit"] {
+            background-color: #4a2b1f;
+            color: #d1c4a8;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #add-form button[type="submit"]:hover {
+            background-color: #6a3b2f;
+        }
+
+        .ammo-fields {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #add-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #8a2be2;
+            color: #fff;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #add-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(138, 43, 226, 0.5);
+        }
+
+        @media (max-width: 480px) {
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Ajustado para telas menores */
+                gap: 15px;
+            }
+
+            .item-card {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            #search-input.active {
+                width: 120px;
+            }
+
+            .actions button {
+                width: 90%;
+                padding: 8px 16px;
+            }
+
+            .type-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .type-button {
+                max-width: none;
+            }
+          }
