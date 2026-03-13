@@ -537,3 +537,12 @@ brightness(-10);
     transition:0.2s;
 }
 
+
+#addbutton{
+        display: block;
+        width: 70%;           
+        margin: 10px auto;    
+        padding: 8px;
+        font-family: 'IM Fell English SC', serif;
+        font-size: 14px;
+    }
