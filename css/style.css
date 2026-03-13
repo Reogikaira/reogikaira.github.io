@@ -480,3 +480,8 @@
                 max-width: none;
             }
         }
+
+        #caixa1-icon {
+        width: 35px;
+        height: 35px;
+       }
