@@ -1,4 +1,5 @@
-       * {
+    
+        * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -267,7 +268,6 @@
     transition: 0.2s;
         }
 
-
         .actions button:hover {
             background-color: #6a3b2f;
         }
@@ -491,16 +491,19 @@
                 max-width: none;
             }
         }
+            
+   #caixa1-icon {
+    width: 35px;
+    height: 35px;
+    color: #a83232;
+}
 
-        #caixa1-icon {
-        width: 35px;
-        height: 35px;
-       }
 
 #delete-button{
     display: block;
     width: 70%;           
     margin: 10px auto;    
+
     padding: 8px;
 
     background: #7a1f1f;  
@@ -538,12 +541,71 @@ brightness(-10);
     transition:0.2s;
 }
 
+    
+    
+}
+    
+    #addbutton{
+        display: block;
+        width: 70%;           
+        margin: 10px auto;    
+        padding: 8px;
+        font-family: 'IM Fell English SC', serif;
+        font-size: 14px;
+    }
+    
+.screen-inventory-page{
+    background:#000000;
+}
 
-#addbutton{
-display: block;
-width: 70%;           
-margin: 10px auto;    
-padding: 8px;
-font-family: 'IM Fell English SC', serif;
-font-size: 14px;        
+.screen-add-page{
+    background:#000000;
+}
+
+.screen-detail-page{
+    background:#000000;
+}
+
+
+.screen-inventory-page::before{
+    content:"⛧";
+
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+
+    font-size:190px;
+
+    color:rgba(220,20,60,0.25);
+
+    pointer-events:none;
+
+    animation:pulsarCarmesim 3.5s ease-in-out infinite;
+}
+
+@keyframes pulsarCarmesim{
+
+    0%{
+        opacity:0.15;
+        text-shadow:
+        0 0 5px rgba(220,20,60,0.3),
+        0 0 10px rgba(220,20,60,0.2);
+    }
+
+    50%{
+        opacity:0.6;
+        text-shadow:
+        0 0 20px rgba(220,20,60,0.9),
+        0 0 40px rgba(220,20,60,0.7),
+        0 0 60px rgba(220,20,60,0.5);
+    }
+
+    100%{
+        opacity:0.15;
+        text-shadow:
+        0 0 5px rgba(220,20,60,0.3),
+        0 0 10px rgba(220,20,60,0.2);
+    }
+
 }
