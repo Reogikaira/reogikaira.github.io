@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
   </head>
-  <body>
+  <body class="screen-inventory">
     <!-- Página de Inventário -->
     <div id="inventory-page" class="page">
       <header>
@@ -60,7 +60,7 @@
           id="add-icon-upload"
           onclick="document.getElementById('add-icon').click()"
         >
-          <img src="imagens/icons/plus1.png" alt="Ícone" />
+          <img src="img/plus1.png" alt="Ícone" />
           <p>Toque para selecionar o ícone da galeria</p>
         </div>
         <input
@@ -82,19 +82,19 @@
           <div class="type-buttons">
             <button type="button" class="type-button" data-type="weapon">
               <span class="type-icon">
-                <img src="imagens/icons/arma1.png" alt="Arma"
+                <img src="img/arma1.png" alt="Arma"
               /></span>
               Armas de fogo
             </button>
             <button type="button" class="type-button" data-type="equipment">
               <span class="type-icon"
-                ><img src="imagens/icons/espada1.png" alt="Arma2"
+                ><img src="img/espada1.png" alt="Arma2"
               /></span>
               Armas corpo a corpo
             </button>
             <button type="button" class="type-button" data-type="consumable">
               <span class="type-icon"
-                ><img src="imagens/icons/caixa1.png" alt="caixa1" class="type-icon" id="caixa1-icon"
+                ><img src="img/caixa1.png" alt="caixa1" class="type-icon" id="caixa1-icon"
               /></span>
               Itens
             </button>
@@ -208,7 +208,11 @@
         });
         const targetPage = document.getElementById(pageId);
         targetPage.style.display = "block";
-        setTimeout(() => targetPage.classList.add("active"), 10); // Para animação suave
+        setTimeout(() => targetPage.classList.add("active"), 10);
+        
+        // muda a classe do body conforme a tela
+  document.body.className = "screen-" + pageId;
+        
       }
 
       function showDetail(id) {
@@ -255,7 +259,8 @@
     else if (item.type === "consumable") {
         // EMPILHAR
         const stackBtn = document.createElement("button");
-        stackBtn.textContent = "Empilhar";
+        stackBtn.textContent = "Empilhar"; 
+        stackBtn.classList.add("btn-empilhar");
         stackBtn.onclick = () => addStack(id);
         actions.appendChild(stackBtn);
 
