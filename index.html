@@ -30,6 +30,21 @@
           <span class="search-icon">🔍</span>
         </div>
       </header>
+     <!-- BARRA DE DANO - MONSTERS OF THE WEEK -->
+<div id="harm-bar" class="harm-bar">
+    <button id="heal-button" class="harm-control" title="Curar dano">−</button>
+    
+    <div class="harm-track-container">
+        <div id="harm-slots" class="harm-slots"></div>
+     
+    </div>
+    
+    <button id="take-harm-button" class="harm-control" title="Tomar dano">+</button>
+</div>
+
+<div
+    <button id="stabilize-btn"</button>
+</div>
       <div class="inventory-grid" id="inventory-grid"></div>
       <button id="add-button">+</button>
     </div>
@@ -49,7 +64,7 @@
       <button id="delete-button">Remover Item</button>
     </div>
 
-    <!-- Página de Adicionar Item -->
+        <!-- Página de Adicionar Item -->
     <div id="add-page" class="page">
       <header>
         <button class="back-button" id="back-to-inventory-add">&larr;</button>
@@ -130,11 +145,68 @@
         <button type="submit" id=addbutton>Adicionar</button>
       </form>
     </div>
+<div id="ficha-page" class="page">
+      <header>
+        <h2>Ficha do Caçador</h2>
+      </header>
 
+      <div class="ficha-cards stats-container">
+        <h3>Atributos</h3>
+        <div class="stat-row">
+          <label>Braveza</label>
+          <input type="number" id="stat-braveza" value="0">
+        </div>
+        <div class="stat-row">
+          <label>Esperteza</label>
+          <input type="number" id="stat-esperteza" value="0">
+        </div>
+        <div class="stat-row">
+          <label>Estranheza</label>
+          <input type="number" id="stat-estranheza" value="0">
+        </div>
+        <div class="stat-row">
+          <label>Firmeza</label>
+          <input type="number" id="stat-firmeza" value="0">
+        </div>
+        <div class="stat-row">
+          <label>Sutileza</label>
+          <input type="number" id="stat-sutileza" value="0">
+        </div>
+      </div>
+
+      <div class="ficha-card luck-container">
+        <h3>Barra de Sorte</h3>
+        <p class="luck-desc">Marque para rolar 12 ou evitar todo o dano. Lembre-se: Sorte não se recupera!</p>
+        <div id="luck-slots" class="luck-slots">
+          </div>
+        <div class="ficha-card xp-container">
+        <h3>Experiência (XP)</h3>
+        <p class="xp-desc">Marque 1 XP sempre que falhar (rolar 6 ou menos). Com 5, você evolui!</p>
+        <div id="xp-slots" class="xp-slots">
+          </div>
+      </div>
+
+      <div class="ficha-card notes-container">
+        <h3>Movimentos e Anotações</h3>
+        <textarea id="character-notes" placeholder="Aqui você pode descrever seus movimentos ou qualquer coisa que você quiser, seja livre"></textarea>
+      </div>
+      </div>
+    </div>
     <script>
-      // JavaScript Otimizado - Funções funcionais, correções de HUD e visibilidade de botões
+    
       let items = JSON.parse(localStorage.getItem("motwInventory")) || [];
       let currentItemId = null;
+    // === NOVO: SISTEMA DE DANO (MONSTERS OF THE WEEK) ===
+      let currentHarm = parseInt(localStorage.getItem("motwHarm")) || 0;
+      let currentRoomCode = null;
+      let isGM = false;
+      let playerId = localStorage.getItem("motwPlayerId") || "player-" + Date.now();
+      localStorage.setItem("motwPlayerId", playerId);
+      let stabilized = JSON.parse(localStorage.getItem("motwStabilized")) || false;
+function saveStabilized() {
+  localStorage.setItem("motwStabilized", JSON.stringify(stabilized));
+}
+      const MAX_HARM = 7;
       const placeholderIcon =
         "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8dGV4dCB4PSIwIiB5PSIyNSIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2FhYSI+Tm8gQ29udGVudDwvdGV4dD4KPC9zdmc+";
       const bulletIcon =
@@ -460,6 +532,286 @@
       // Inicializar
       renderInventory();
       showPage("inventory-page");
+    // ==================== FUNÇÕES DE DANO ====================
+      const emptySVG = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="3" ry="3" stroke="#4a2b1f" stroke-width="3"/></svg>`;
+      
+const skull_7 = `
+<svg viewBox="0 0 24 24">
+  <path fill="#d9d9d9" d="M12 2C7 2 4 5.5 4 9c0 2.5 1.5 4.5 3 5.8V18h10v-3.2c1.5-1.3 3-3.3 3-5.8 0-3.5-3-7-8-7z"/>
+  <circle cx="9" cy="9" r="2.2" fill="#000"/>
+  <circle cx="15" cy="9" r="2.2" fill="#000"/>
+  <path d="M12 11.5l-2 3h4z" fill="#000"/>
+</svg>`;
+
+const skull_6 = skull_7.replace("</svg>",
+`<path d="M10 4 L11.5 7 L10.5 9" stroke="#000" stroke-width="1"/></svg>`);
+
+const skull_5 = skull_6.replace("</svg>",
+`<path d="M14 5 L13.5 7.5 L15 10" stroke="#000" stroke-width="1"/></svg>`);
+
+const skull_4 = skull_5.replace("</svg>",
+`<path d="M8 12 L10 13.5 L9 16" stroke="#000" stroke-width="1"/></svg>`);
+
+const skull_3 = skull_4.replace("</svg>",
+`<path d="M7.5 8 L9.5 10.5 L8.5 13" stroke="#000" stroke-width="1"/></svg>`);
+
+const skull_2 = skull_3.replace("</svg>",
+`<path d="M12 13.5 L14 15 L13 18" stroke="#000" stroke-width="1"/></svg>`);
+
+const skull_1 = skull_2.replace("</svg>",
+`<path d="M11 3 L12.5 6 L11.5 8" stroke="#000" stroke-width="1"/></svg>`);
+      function saveHarm() {
+        localStorage.setItem("motwHarm", currentHarm);
+      }
+function getSkullByDamage(index) {
+  // quanto mais pra direita, mais quebrado
+  switch (index) {
+    case 0: return skull_7; // intacto
+    case 1: return skull_6;
+    case 2: return skull_5;
+    case 3: return skull_4;
+    case 4: return skull_3;
+    case 5: return skull_2;
+    case 6: return skull_1; // quase quebrado
+    default: return skull_1;
+  }
+}
+      function renderHarmTrack() {
+  const slotsContainer = document.getElementById("harm-slots");
+  slotsContainer.innerHTML = "";
+
+  // Remove classes antigas
+  slotsContainer.classList.remove("global-unstable");
+
+  const isUnstable = currentHarm >= 4 && !stabilized;
+
+  for (let i = 0; i < MAX_HARM; i++) {
+    const slot = document.createElement("div");
+    slot.classList.add("harm-slot");
+
+    if (currentHarm > i) {
+      slot.classList.add("filled");
+
+      // Coloquei a inserção do HTML antes para o seu querySelector funcionar!
+      slot.innerHTML = getSkullByDamage(i);
+
+      if (isUnstable) {
+        const severity = currentHarm - 3;
+        slot.classList.add(`unstable-level-${severity}`);
+        slot.classList.add("pulsing-red");
+
+        if (slot.querySelector("svg")) {
+          slot.querySelector("svg").classList.add("unstable-skull");
+        }
+      }
+
+      // --- NOSSA NOVA LÓGICA DE ESTABILIZAR ENTRA AQUI ---
+      // Se for a ÚLTIMA caveira marcada (i === currentHarm - 1) E o dano for >= 4
+      // ... dentro do seu if (currentHarm > i) ...
+
+      // Verifica se é a ÚLTIMA caveira marcada a partir da quarta
+      if (i === currentHarm - 1 && currentHarm >= 4) {
+        slot.onclick = stabilizePlayer;
+        
+        // Aplica a classe de detalhe dependendo do estado
+        if (stabilized) {
+          slot.classList.add("slot-stabilized");
+        } else {
+          slot.classList.add("slot-needs-stabilizing");
+        }
+      }
+      // ----------------------------------------------------
+
+    } else {
+      slot.innerHTML = emptySVG;
+    }
+
+    slotsContainer.appendChild(slot);
+  }
+
+  // Ativa tremor global na barra quando está instável
+  if (isUnstable) {
+    slotsContainer.classList.add("global-unstable");
+  }
+}
+     function takeHarm() {
+  if (currentHarm < MAX_HARM) {
+    currentHarm++;
+    stabilized = false;           // ← NOVO: novo dano sempre desestabiliza
+    saveHarm();
+    saveStabilized();             // ← NOVO
+    renderHarmTrack();
+  }
+}
+
+      function healHarm() {
+  if (currentHarm > 0) {
+    currentHarm--;
+    if (currentHarm < 4) stabilized = false;
+    saveHarm();
+    saveStabilized();
+    renderHarmTrack();
+  }
+}
+ 
+      renderHarmTrack();
+      document.getElementById("take-harm-button").addEventListener("click", takeHarm);
+      document.getElementById("heal-button").addEventListener("click", healHarm);
+    
+
+
+
+function listenToMyData() {
+  const playerRef = db.ref(`campaigns/\( {currentRoomCode}/players/ \){playerId}`);
+  playerRef.on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      items = data.items || [];
+      currentHarm = data.harm || 0;
+      renderInventory();
+      renderHarmTrack();
+    }
+  });
+}
+
+function listenToAllPlayers() {
+  const playersRef = db.ref(`campaigns/${currentRoomCode}/players`);
+  playersRef.on("value", (snapshot) => {
+    const allPlayers = snapshot.val();
+    if (allPlayers) {
+      updateGMDashboard(allPlayers);
+    }
+  });
+}
+
+function saveItems() {
+  localStorage.setItem("motwInventory", JSON.stringify(items));
+}
+      /* ====================== ESTABILIZAÇÃO (sempre disponível a partir de 4) ====================== */
+function stabilizePlayer() {
+  if (currentHarm >= 4) {
+    stabilized = true;
+    saveStabilized();
+    renderHarmTrack();            // re-renderiza sem os efeitos de pulso
+    console.log("✅ Estabilizado");
+  }
+}
+
+// Conectar o botão
+document.getElementById("stabilize-btn").addEventListener("click", stabilizePlayer);
+   // ==================== SISTEMA DE FICHA E SORTE (MOTW) ====================
+
+    // 1. Lógica da Barra de Sorte (7 espaços em MotW)
+    // Inicializa uma array com 7 'falsos' (nenhuma sorte gasta) ou puxa o que já está salvo
+    let luckBoxes = JSON.parse(localStorage.getItem("motwLuck")) || [false, false, false, false, false, false, false];
+
+    function renderLuck() {
+      const container = document.getElementById("luck-slots");
+      if(!container) return; // Proteção caso o HTML não carregue
+      
+      container.innerHTML = ""; // Limpa antes de desenhar
+      
+      luckBoxes.forEach((isUsed, index) => {
+        const box = document.createElement("div");
+        box.className = "luck-slot" + (isUsed ? " used" : "");
+        
+        // Quando o jogador clica, alterna entre marcado e desmarcado
+        box.onclick = () => {
+          luckBoxes[index] = !luckBoxes[index];
+          localStorage.setItem("motwLuck", JSON.stringify(luckBoxes));
+          renderLuck(); // Desenha de novo para atualizar a tela
+        };
+        
+        container.appendChild(box);
+      });
+    }
+
+    // 2. Lógica dos Atributos
+    const atributos = ["braveza", "esperteza", "estranheza", "firmeza", "sutileza"];
+    
+    function initStats() {
+      atributos.forEach(stat => {
+        const input = document.getElementById(`stat-${stat}`);
+        if(input) {
+          // Carrega o valor salvo ou deixa 0 como padrão
+          input.value = localStorage.getItem(`motwStat_${stat}`) || 0;
+          
+          // Quando o jogador digitar um número novo, salva automaticamente!
+          input.addEventListener("change", (e) => {
+            localStorage.setItem(`motwStat_${stat}`, e.target.value);
+          });
+        }
+      });
+    }
+
+    // Chama as funções para carregar tudo assim que abrir o app
+    renderLuck();
+    initStats();
+    // Detectar teclado aberto para esconder o rodapé
+const initialHeight = window.innerHeight;
+
+window.addEventListener('resize', () => {
+    const bottomNav = document.getElementById('bottom-nav');
+    const addButton = document.querySelector('.add-button');
+    
+    // Se a altura atual for significativamente menor que a inicial, o teclado abriu
+    if (window.innerHeight < initialHeight * 0.8) {
+        bottomNav.style.display = 'none';
+        if(addButton) addButton.style.bottom = '20px'; // Desce o botão + para não flutuar no meio do nada
+    } else {
+        bottomNav.style.display = 'flex';
+        if(addButton) addButton.style.bottom = '90px'; // Volta o botão + para cima do menu
+    }
+});
+    // ==================== LÓGICA DE XP E NOTAS ====================
+
+    // 1. Gerenciamento de XP (5 espaços)
+    let xpPoints = JSON.parse(localStorage.getItem("motwXP")) || [false, false, false, false, false];
+
+    function renderXP() {
+      const container = document.getElementById("xp-slots");
+      if(!container) return;
+      container.innerHTML = "";
+
+      xpPoints.forEach((isMarked, index) => {
+        const slot = document.createElement("div");
+        slot.className = "xp-slot" + (isMarked ? " marked" : "");
+        
+        slot.onclick = () => {
+          xpPoints[index] = !xpPoints[index];
+          localStorage.setItem("motwXP", JSON.stringify(xpPoints));
+          renderXP();
+          
+         // Feedback visual se completar 5 XP
+          if (xpPoints.every(p => p === true)) {
+            alert("Você sobreviveu para mais um level, parabéns!!!");
+          }
+        };
+        container.appendChild(slot);
+      });
+    }
+
+    // 2. Gerenciamento das Notas
+    function initNotes() {
+      const notesArea = document.getElementById("character-notes");
+      if(!notesArea) return;
+
+      // Carrega notas salvas
+      notesArea.value = localStorage.getItem("motwNotes") || "";
+
+      // Salva enquanto o player digita (debounce de leve)
+      notesArea.addEventListener("input", (e) => {
+        localStorage.setItem("motwNotes", e.target.value);
+      });
+    }
+
+    // Inicializa tudo ao carregar a página
+    renderXP();
+    initNotes();
     </script>
+    <nav id="bottom-nav">
+      <button onclick="showPage('inventory-page')">🎒 Inventário</button>
+      <button onclick="showPage('ficha-page')">📜 Ficha</button>
+    </nav>
   </body>
 </html>
