@@ -1,4 +1,4 @@
-    
+    /* CSS Atualizado - Tema rústico e sombrio de bruxaria, com texturas escuras, fontes góticas e melhor responsividade para Android */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -436,6 +436,26 @@
         }
 
         #add-button {
+            position: fixed !important;
+    bottom: 90px !important; /* Altura suficiente para ficar acima do rodapé */
+    right: 20px !important;
+    z-index: 999 !important; /* Garante que ele fique na frente de tudo */
+    
+    /* Estética para combinar com o tema */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4a2b1f;
+    color: #d1c4a8;
+    font-size: 30px;
+    border: 2px solid #c7a57a;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+/* Ajuste para garantir que a lista de itens não termine atrás do menu */
+#inventory-list, .page {
+    padding-bottom: 120px !important; 
+}
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -567,22 +587,6 @@ brightness(-10);
 }
 
 
-.screen-inventory-page::before{
-    content:"⛧";
-
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-
-    font-size:190px;
-
-    color:rgba(220,20,60,0.25);
-
-    pointer-events:none;
-
-    animation:pulsarCarmesim 3.5s ease-in-out infinite;
-}
 
 @keyframes pulsarCarmesim{
 
@@ -608,4 +612,501 @@ brightness(-10);
         0 0 10px rgba(220,20,60,0.2);
     }
 
+}
+
+/* ====================== BARRA DE DANO - MOTW (7 slots + pulso vermelho) feito pela IA ====================== */
+.harm-bar {
+    background-color: #3a2a2a;
+    border-bottom: 2px solid #4a2b1f;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+.harm-slots {
+    display: flex;
+    gap: 5px;
+}
+
+.harm-slot {
+    width: 28px;
+    height: 28px;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.7);
+    transition: all 0.2s ease;
+}
+
+.harm-slot.filled {
+    background-color: #7a1f1f;
+}
+
+/* ====================== EFEITO A PARTIR DO INSTÁVEL feito pela IA====================== */
+.harm-slot.pulsing-red {
+    animation: pulsarVermelho 1.2s ease-in-out infinite;
+    box-shadow: 0 0 12px #ff2222;
+}
+
+/* Vermelho vai escurecendo até preto (morte) */
+.harm-slot.unstable-level-1 { background-color: #c22a2a; }   /* 4º dano */
+.harm-slot.unstable-level-2 { background-color: #9f1f1f; }   /* 5º */
+.harm-slot.unstable-level-3 { background-color: #7a1a1a; }   /* 6º */
+.harm-slot.unstable-level-4 { background-color: #1a1a1a; }   /* 7º = preto (morte) */
+
+.harm-control {
+    background: none;
+    border: 2px solid #c7a57a;
+    color: #c7a57a;
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    opacity: 0.85;
+}
+
+.harm-control:hover,
+.harm-control:active {
+    background-color: #c7a57a;
+    color: #2a2a2a;
+    opacity: 1;
+    transform: scale(1.12);       /* feedback visual forte no toque */
+}
+
+/* Animação de pulso vermelho forte */
+@keyframes pulsarVermelho {
+    0%   { opacity: 0.75; filter: brightness(1); }
+    50%  { opacity: 1;    filter: brightness(1.3); }
+    100% { opacity: 0.75; filter: brightness(1); }
+}
+
+.harm-control:active {
+    transform: scale(0.92);
+}
+
+.unstable-skull {
+  animation: skullShake 0.15s infinite;
+  transform-origin: center;
+}
+/* base: só ativa no estado instável */
+.pulsing-red svg {
+  transform-origin: center;
+}
+
+/* ========================= */
+/* NÍVEL 1 (leve - só glitch) */
+/* ========================= */
+.unstable-level-1 svg {
+  animation: skullGlitch 0.8s infinite;
+}
+
+/* ========================= */
+/* NÍVEL 2 (começa tremer) */
+/* ========================= */
+.unstable-level-2 svg {
+  animation: skullShake 0.15s infinite, skullGlitch 0.8s infinite;
+}
+
+/* ========================= */
+/* NÍVEL 3 (mais intenso) */
+/* ========================= */
+.unstable-level-3 svg {
+  animation: skullShake 0.12s infinite, skullGlitch 0.6s infinite;
+}
+
+/* ========================= */
+/* NÍVEL 4 (CRÍTICO - igual seu antigo) */
+/* ========================= */
+.unstable-level-4 svg {
+  animation: skullShake 0.1s infinite, skullGlitch 0.5s infinite;
+  filter: drop-shadow(0 0 3px red);
+}
+/* tremor */
+@keyframes skullShake {
+  0%   { transform: translate(0px, 0px) rotate(0deg); }
+  25%  { transform: translate(0.5px, -0.5px) rotate(-1deg); }
+  50%  { transform: translate(-0.5px, 0.5px) rotate(1deg); }
+  75%  { transform: translate(0.5px, 0.5px) rotate(-1deg); }
+  100% { transform: translate(0px, 0px) rotate(0deg); }
+}
+
+/* glitch piscando */
+@keyframes skullGlitch {
+  0%, 100% { opacity: 1; }
+  20% { opacity: 0.6; }
+  40% { opacity: 1; }
+  60% { opacity: 0.4; }
+  80% { opacity: 1; }
+}
+/* Tremor global na barra inteira quando instável */
+.global-unstable {
+  animation: barShake 0.4s infinite alternate ease-in-out;
+}
+
+@keyframes barShake {
+  from { transform: translateX(-1px); }
+  to   { transform: translateX(1px); }
+}
+
+/* ====================== MENU INFERIOR ====================== */
+#bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    border-top: 2px solid #4a2b1f;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.8);
+}
+
+#bottom-nav button {
+    background: none;
+    border: none;
+    color: #d1c4a8;
+    font-family: 'IM Fell English SC', serif;
+    font-size: 18px;
+    cursor: pointer;
+    flex: 1;
+    transition: 0.3s;
+}
+
+#bottom-nav button:hover {
+    color: #c7a57a;
+    text-shadow: 0 0 5px rgba(199, 165, 122, 0.5);
+}
+
+/* Espaço extra no final das páginas para o conteúdo não ficar escondido atrás do menu */
+.page {
+    padding-bottom: 80px !important; 
+}
+
+/* ====================== FICHA: ATRIBUTOS E SORTE ====================== */
+/* CONTAINER GERAL DA FICHA - Organização e Respiro */
+#ficha-page {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Espaço uniforme entre cada "card" */
+    padding: 20px;
+    background: linear-gradient(to bottom, #121212, #1a1a1a);
+}
+
+/* ESTILO UNIFICADO DE CARD (Para todas as seções) */
+.ficha-card {
+    background-color: #1e1e1e;
+    border: 1px solid #3d2b1f;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Adiciona um detalhe de "ouro velho" no topo de cada card */
+.ficha-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #c7a57a, transparent);
+}
+
+/* Títulos das Seções */
+.ficha-card h3 {
+    font-family: 'IM Fell English SC', serif;
+    color: #c7a57a;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(199, 165, 122, 0.2);
+    padding-bottom: 10px;
+}
+
+/* Ajuste das linhas de Atributos */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(209, 196, 168, 0.1);
+}
+
+.stat-row:last-child { border-bottom: none; }
+
+/* Bloco de Notas mais limpo */
+#character-notes {
+    width: 100%;
+    min-height: 150px;
+    background-color: #121212;
+    color: #d1c4a8;
+    border: 1px solid #4a2b1f;
+    border-radius: 8px;
+    padding: 15px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.stats-container h3, .luck-container h3 {
+    color: #c7a57a;
+    text-align: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #4a2b1f;
+    padding-bottom: 5px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.stat-row label {
+    font-size: 18px;
+    color: #d1c4a8;
+}
+
+.stat-row input {
+    width: 60px;
+    text-align: center;
+    font-size: 18px;
+    padding: 8px;
+    background-color: #1a1a1a;
+}
+
+.luck-desc {
+    font-size: 12px;
+    color: #a0a0a0;
+    text-align: center;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.luck-slots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.luck-slot {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #c7a57a;
+    border-radius: 50%; /* Bolinhas redondas para diferenciar dos quadradinhos de vida */
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a;
+}
+
+/* Quando o slot de Sorte for marcado (queimado) */
+.luck-slot.used {
+    background-color: #c7a57a;
+    box-shadow: 0 0 8px rgba(199, 165, 122, 0.8);
+}
+
+.luck-slot.used::after {
+    content: "✖"; /* Um X no meio */
+    font-weight: bold;
+    color: #121212;
+    font-size: 16px;
+}
+
+/* ====================== XP E NOTAS ====================== */
+.xp-container{
+    background-color: #2a2a2a;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #4a2b1f;
+    max-width: 400px;
+}
+
+.xp-desc {
+    font-size: 11px;
+    color: #a0a0a0;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.xp-slots {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Quadrados de XP (estilo diamante) */
+.xp-slot {
+    width: 25px;
+    height: 25px;
+    border: 2px solid #8b0000; /* Vermelho escuro para XP */
+    transform: rotate(45deg); /* Vira um diamante */
+    cursor: pointer;
+    background-color: #1a1a1a;
+    transition: 0.3s;
+}
+
+.xp-slot.marked {
+    background-color: #ff4500; /* Laranja/Vermelho vivo ao marcar */
+    box-shadow: 0 0 10px #ff4500;
+}
+
+/* CONTAINER DO GRIMÓRIO */
+.notes-container {
+    background: #f4e4bc; /* Cor de pergaminho antigo */
+    background-image: url('https://www.transparenttextures.com/patterns/old-paper.png'); /* Textura de papel */
+    margin: 20px auto;
+    padding: 15px;
+    border: 2px solid #4a2b1f;
+    border-radius: 5px;
+    box-shadow: 10px 10px 20px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.1);
+    max-width: 95%;
+}
+
+.notes-container h2 {
+    color: #2a1a10;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+/* O CAMPO DE TEXTO EM SI */
+#character-notes {
+    width: 100%;
+    min-height: 400px; /* Aumentamos drasticamente a altura inicial */
+    background: transparent;
+    border: none;
+    color: #1a1005; /* Cor de tinta nanquim antiga */
+    font-family: 'IM Fell English SC', serif;
+    font-size: 16px;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    padding: 10px;
+}
+
+/* Scrollbar personalizada para não quebrar o clima */
+#character-notes::-webkit-scrollbar {
+    width: 8px;
+}
+
+#character-notes::-webkit-scrollbar-thumb {
+    background: #4a2b1f;
+    border-radius: 10px;
+}
+/* ====================== BARRA DE DANO - LAYOUT EQUILIBRADO ====================== */
+.harm-bar {
+    padding: 10px 12px;
+    gap: 8px;                    /* espaço entre - , track e + */
+    background-color: #3a2a2a;
+    border-bottom: 2px solid #4a2b1f;
+}
+
+.harm-track-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;                    /* espaço controlado entre slots e trigger */
+    min-width: 0;                /* permite encolher sem quebrar */
+}
+
+/* Os slots de dano ficam no centro e respiram */
+.harm-slots {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+    max-width: 240px;            /* limita o crescimento das caveiras */
+}
+
+/* TRIGGER COMPACTO E BONITO */
+#stabilize-trigger {
+    display: none;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    background: #7a1f1f;
+    border: 2px solid #e8d8b5;
+    border-radius: 50%;
+    font-size: 16px;             /* ícone menor */
+    box-shadow: 0 0 10px #ff4444;
+    cursor: pointer;
+    flex-shrink: 0;              /* NUNCA encolhe */
+    transition: all 0.25s ease;
+}
+
+#stabilize-trigger.visible {
+    display: flex;
+}
+
+#stabilize-trigger.pulsing {
+    animation: stabilizePulse 1.3s ease-in-out infinite;
+}
+
+@keyframes stabilizePulse {
+    0%, 100% { box-shadow: 0 0 10px #ff4444; transform: scale(1); }
+    50%      { box-shadow: 0 0 18px #ff7777; transform: scale(1.08); }
+}
+
+#stabilize-trigger.stabilized {
+    background: #3a2a2a;
+    border-color: #c7a57a;
+    box-shadow: 0 0 8px #c7a57a;
+    animation: none;
+}
+
+/* EFEITO: FERIDA ABERTA (Instável) */
+.slot-needs-stabilizing {
+    cursor: pointer !important;
+    /* Moldura dupla: uma linha fina escura e um brilho vermelho ao redor */
+    border: 1px solid #ff4444 !important;
+    outline: 2px solid #300; /* Cria uma separação elegante */
+    outline-offset: 2px;
+    
+    background: rgba(139, 0, 0, 0.3) !important;
+    
+    /* Sombra complexa: Glow externo + Sombra interna para dar volume */
+    box-shadow: 
+        0 0 12px rgba(255, 0, 0, 0.7),
+        inset 0 0 10px rgba(0, 0, 0, 0.8) !important;
+        
+    animation: bloodThrob 2s infinite ease-in-out !important;
+}
+
+/* --- ESTADO ESTABILIZADO */
+.slot-stabilized {
+    cursor: default !important;
+
+    border: 2px solid #FFFFFF !important; 
+    
+    box-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.4), 
+        inset 0 0 5px rgba(255, 255, 255, 0.2) !important;
+    
+    animation: none !important;
+    transition: all 0.5s ease;
 }
